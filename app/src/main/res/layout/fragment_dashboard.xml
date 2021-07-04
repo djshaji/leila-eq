@@ -6,17 +6,96 @@
     android:layout_height="match_parent"
     tools:context=".ui.dashboard.DashboardFragment">
 
-    <TextView
-        android:id="@+id/text_dashboard"
+    <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_marginStart="8dp"
-        android:layout_marginTop="8dp"
-        android:layout_marginEnd="8dp"
-        android:textAlignment="center"
-        android:textSize="20sp"
-        app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent" />
+        android:orientation="vertical">
+
+
+        <TextView
+            android:id="@+id/textView2"
+            android:layout_marginTop="30dp"
+            android:layout_marginRight="30dp"
+            android:layout_marginLeft="30dp"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="Bass Boost" />
+
+        <SeekBar
+            android:id="@+id/seekBar"
+            android:layout_marginTop="10dp"
+            android:layout_marginLeft="30dp"
+            android:layout_marginRight="30dp"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content" />
+
+        <TextView
+            android:id="@+id/textView4"
+            android:layout_marginTop="30dp"
+            android:layout_marginRight="30dp"
+            android:layout_marginLeft="30dp"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="Surround Sound" />
+
+        <SeekBar
+            android:id="@+id/seekBar3"
+            android:layout_marginTop="10dp"
+            android:layout_marginLeft="30dp"
+            android:layout_marginRight="30dp"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content" />
+
+        <TextView
+            android:layout_marginTop="30dp"
+            android:layout_marginRight="30dp"
+            android:layout_marginLeft="30dp"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="Reverb" />
+
+        <RadioGroup
+            android:layout_width="match_parent"
+            android:layout_height="match_parent" >
+
+            <RadioButton
+                android:id="@+id/r_none"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="None" />
+            <RadioButton
+                android:id="@+id/r_plate"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="Plate" />
+            <RadioButton
+                android:id="@+id/r_sm_room"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="Small Room" />
+            <RadioButton
+                android:id="@+id/r_md_room"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="Medium Room" />
+            <RadioButton
+                android:id="@+id/r_lg_room"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="Large Room" />
+            <RadioButton
+                android:id="@+id/r_md_hall"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="Medium Hall" />
+            <RadioButton
+                android:id="@+id/r_lg_hall"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="Large Hall" />
+
+        </RadioGroup>
+
+
+    </LinearLayout>
 </androidx.constraintlayout.widget.ConstraintLayout>

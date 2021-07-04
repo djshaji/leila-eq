@@ -4,19 +4,109 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
+    android:fitsSystemWindows="true"
     tools:context=".ui.notifications.NotificationsFragment">
-
-    <TextView
-        android:id="@+id/text_notifications"
+    <LinearLayout
         android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:layout_marginStart="8dp"
-        android:layout_marginTop="8dp"
-        android:layout_marginEnd="8dp"
-        android:textAlignment="center"
-        android:textSize="20sp"
-        app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent" />
+        android:layout_height="match_parent"
+        android:layout_margin="20dp"
+        android:orientation="vertical">
+
+        <Switch
+            android:id="@+id/switch1"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="Compressor"
+            tools:layout_editor_absoluteX="196dp"
+            tools:layout_editor_absoluteY="36dp" />
+
+        <RadioGroup
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content" >
+
+        <RadioButton
+            android:id="@+id/r_none"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="Minimal" />
+        <RadioButton
+            android:id="@+id/c_ambient"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="Ambient" />
+        <RadioButton
+            android:id="@+id/c_music"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="Music" />
+        <RadioButton
+            android:id="@+id/c_movie"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="Movie" />
+        <RadioButton
+            android:id="@+id/c_porn"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="Porn" />
+
+        </RadioGroup>
+
+        <Switch
+            android:layout_marginTop="20dp"
+            android:id="@+id/switch2"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="Limiter" />
+        <RadioGroup
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content" >
+
+        <RadioButton
+            android:id="@+id/lmt_light"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="Light" />
+        <RadioButton
+            android:id="@+id/lmt_heavy"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="Heavy" />
+        <RadioButton
+            android:id="@+id/lmt_extreme"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="Extreme" />
+        <RadioButton
+            android:id="@+id/lmt_nuts"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="Are you nuts?" />
+        </RadioGroup>
+
+        <Switch
+            android:layout_marginTop="20dp"
+            android:id="@+id/switch3"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="Loudness Enhancer" />
+
+        <TextView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginLeft="30dp"
+            android:layout_marginRight="30dp"
+            android:layout_marginTop="10dp"
+            android:layout_marginBottom="10dp"
+            android:text="Gain" />
+
+        <SeekBar
+            android:id="@+id/seekBar4"
+            android:layout_marginLeft="30dp"
+            android:layout_marginRight="30dp"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content" />
+
+    </LinearLayout>
+
 </androidx.constraintlayout.widget.ConstraintLayout>
