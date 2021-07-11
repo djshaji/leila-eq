@@ -73,7 +73,7 @@
             android:layout_margin="30dp"
             android:id="@+id/select_stream"
             android:layout_width="match_parent"
-            android:layout_height="match_parent" >
+            android:layout_height="wrap_content" >
 
             <TextView
                 android:id="@+id/textView"
@@ -86,7 +86,15 @@
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:text="System Audio" />
+
         </RadioGroup>
+
+        <Button
+            android:id="@+id/open_eq"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_margin="20dp"
+            android:text="Open System EQ" />
 
     </LinearLayout>
 </androidx.constraintlayout.widget.ConstraintLayout>
