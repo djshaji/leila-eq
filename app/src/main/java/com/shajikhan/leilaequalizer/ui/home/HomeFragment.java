@@ -10,23 +10,32 @@ import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.ServiceConnection;
+import android.content.SharedPreferences;
 import android.content.pm.PackageManager;
 import android.media.MediaPlayer;
 import android.media.audiofx.AudioEffect;
 import android.media.audiofx.Equalizer;
+import android.os.Build;
 import android.os.Bundle;
 import android.os.IBinder;
+import android.util.Log;
 import android.view.Gravity;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.AdapterView;
+import android.widget.ArrayAdapter;
 import android.widget.Button;
 import android.widget.LinearLayout;
+import android.widget.ProgressBar;
 import android.widget.SeekBar;
+import android.widget.Spinner;
+import android.widget.Switch;
 import android.widget.TextView;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
+import androidx.annotation.RequiresApi;
 import androidx.core.content.ContextCompat;
 import androidx.fragment.app.Fragment;
 import androidx.lifecycle.Observer;
@@ -51,20 +60,37 @@ public class HomeFragment extends Fragment {
     private LinearLayout mLinearLayout;
     private Equalizer mEqualizer;
     LeilaService leilaService ;
+    short current_preset = 0 ;
+    ArrayList <SeekBar> eqSeeks = new ArrayList <SeekBar> () ;
 
+    SharedPreferences sharedPref ;
+    SharedPreferences.Editor pref ;
+
+    short minEQLevel ;
+    short maxEQLevel ;
+
+    String tag = "EqualizerView" ;
     Context context ;
+    private ServiceConnection serviceConnection ;
 
     public View onCreateView(@NonNull LayoutInflater inflater,
                              ViewGroup container, Bundle savedInstanceState) {
+        Log.d(tag, "on create");
         homeViewModel =
                 new ViewModelProvider(this).get(HomeViewModel.class);
+
+        sharedPref = getActivity().getPreferences(Context.MODE_PRIVATE);
+        pref = sharedPref.edit();
 
         binding = FragmentHomeBinding.inflate(inflater, container, false);
         View root = binding.getRoot();
         context = getActivity();
+        mLinearLayout = root.findViewById (R.id.eq_ll);
 
-        mEqualizer = new Equalizer(1, new MediaPlayer().getAudioSessionId());
-//        mEqualizer = context.leilaService.equalizer();
+//        mEqualizer = new Equalizer(1, new MediaPlayer().getAudioSessionId());
+//        mEqualizer = context.eq ;
+//        mEqualizer = leilaService.equalizer ();
+
         if(ContextCompat.checkSelfPermission(context, Manifest.permission.MODIFY_AUDIO_SETTINGS)
                 != PackageManager.PERMISSION_GRANTED)
         {
@@ -80,6 +106,7 @@ public class HomeFragment extends Fragment {
 
         }
 
+
         final Button button = root.findViewById(R.id.open_eq);
         button.setOnClickListener(new View.OnClickListener() {
             public void onClick(View v) {
@@ -92,18 +119,95 @@ public class HomeFragment extends Fragment {
             }
         });
 
-        mLinearLayout = root.findViewById (R.id.eq_ll);
+        serviceConnection = new ServiceConnection() {
+            public void onServiceConnected(ComponentName className,
+                                           IBinder service) {
+                leilaService =
+                        ((LeilaService.ServiceBinder) service).getService();
+                setupEqualizer();
+                //TODO restore eq levels here
+//            for(short i = 0; i < 5; i ++) {
+//                eqService.equalizer().setBandLevel(i, model.getBandLevel(i));
+//            }
+            }
+
+            public void onServiceDisconnected(ComponentName className) {
+                leilaService = null;
+            }
+        };
+
+        context.bindService(new Intent(context,LeilaService.class), serviceConnection, Context.BIND_AUTO_CREATE);
+        return root;
+    }
+
+    @Override
+    public void onDestroyView() {
+        super.onDestroyView();
+        binding = null;
+    }
+
+    @RequiresApi(api = Build.VERSION_CODES.O)
+    private void setupEqualizer () {
+        Log.d (tag, "setting up eq");
+        View root = binding.getRoot();
+        ProgressBar progressBar = root.findViewById(R.id.eq_progressBar);
+        mEqualizer = leilaService.equalizer();
+        ArrayList<String> presets = new ArrayList<String>();
+
+        int i = 0 ;
+        for (i = 0 ; i < mEqualizer.getNumberOfPresets() ; i ++) {
+            presets.add(mEqualizer.getPresetName((short) i));
+        }
+
+        Spinner preset = (Spinner) root.findViewById(R.id.eq_presets);
+        ArrayAdapter<String> stringArrayAdapter =
+                new ArrayAdapter<String>(context,  android.R.layout.simple_spinner_dropdown_item, presets);
+        stringArrayAdapter.setDropDownViewResource( android.R.layout.simple_spinner_dropdown_item);
+
+        preset.setAdapter(stringArrayAdapter);
+        preset.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
+            @Override
+            public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
+                short bands = mEqualizer.getNumberOfBands();
+                mEqualizer.usePreset((short) position);
+                for (short i = 0 ; i < bands; i ++) {
+                    Log.d(tag, "EQ " + i + " :" + mEqualizer.getBandLevel(i));
+//                    eqSeeks.get(i).setMax(0);
+                    eqSeeks.get(i).setMax(maxEQLevel);
+                    Log.d (tag, "max" + maxEQLevel);
+//                    eqSeeks.get(i).setMin(minEQLevel);
+                    eqSeeks.get(i).setProgress(mEqualizer.getBandLevel(i));
+                }
+
+                current_preset = (short) position;
+                mEqualizer.usePreset((short) position);
+            }
+
+            @Override
+            public void onNothingSelected(AdapterView<?> parent) {
+//                mEqualizer.usePreset((short) 0);
+//                short bands = mEqualizer.getNumberOfBands();
+//                for (short i = 0 ; i < bands; i ++) {
+//                    eqSeeks.get(i).setProgress(mEqualizer.getBandLevel(i));
+//                }
+
+            }
+        });
+
+        preset.setSelection(mEqualizer.getCurrentPreset());
+        mLinearLayout.removeAllViews();
+//        mLinearLayout = root.findViewById (R.id.eq_ll);
 //        mLinearLayout = new LinearLayout(context);
         short bands = mEqualizer.getNumberOfBands();
 
-        final short minEQLevel = mEqualizer.getBandLevelRange()[0];
-        final short maxEQLevel = mEqualizer.getBandLevelRange()[1];
+        minEQLevel = mEqualizer.getBandLevelRange()[0];
+        maxEQLevel = mEqualizer.getBandLevelRange()[1];
 
         mLinearLayout.setOrientation(LinearLayout.VERTICAL);
 //        short bands = 5 ; //TODO: do this automagically
         int band_freq [] = {60, 500, 1000, 8000, 14000};
-        for (short i = 0; i < bands; i++) {
-            final short band = i;
+        for (i = 0; i < bands; i++) {
+            final short band = (short) i;
 
             TextView freqTextView = new TextView(context);
             freqTextView.setLayoutParams(new ViewGroup.LayoutParams(
@@ -137,25 +241,30 @@ public class HomeFragment extends Fragment {
                     ViewGroup.LayoutParams.MATCH_PARENT);
             layoutParams.weight = 1;
             SeekBar bar = new SeekBar(context);
+            eqSeeks.add(bar);
             bar.setLayoutParams(layoutParams);
 //            bar.setMax(12);
             bar.setMax(maxEQLevel - minEQLevel);
-            bar.setProgress(mEqualizer.getBandLevel(band));
+            bar.setMin(minEQLevel);
+            bar.setProgress(sharedPref.getInt("eq-" + band, mEqualizer.getBandLevel(band)));
 
 //            bar.setProgress(6);
 
-            /*
+
             bar.setOnSeekBarChangeListener(new SeekBar.OnSeekBarChangeListener() {
                 public void onProgressChanged(SeekBar seekBar, int progress,
                                               boolean fromUser) {
-                    mEqualizer.setBandLevel(band, (short) (progress + minEQLevel));
+//                    mEqualizer.setBandLevel(band, (short) (progress + minEQLevel));
+                    mEqualizer.setBandLevel(band, (short) progress);
+                    pref.putInt("eq-" + band, progress).apply();
+
                 }
 
                 public void onStartTrackingTouch(SeekBar seekBar) {}
                 public void onStopTrackingTouch(SeekBar seekBar) {}
             });
 
-             */
+
 
             row.addView(minDbTextView);
             row.addView(bar);
@@ -164,13 +273,15 @@ public class HomeFragment extends Fragment {
             mLinearLayout.addView(row);
         }
 
-        return root;
-    }
+        String [] sinks =  {"System Default"} ;
+        Spinner spinner = (Spinner) root.findViewById(R.id.audio_sinks);
+        // Create an ArrayAdapter using the string array and a default spinner layout
+        ArrayAdapter<CharSequence> adapter = ArrayAdapter.createFromResource(context,
+                R.array.sinks, android.R.layout.simple_spinner_item);
+        // Specify the layout to use when the list of choices appears
+        adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
+        // Apply the adapter to the spinner
+        spinner.setAdapter(adapter);
 
-    @Override
-    public void onDestroyView() {
-        super.onDestroyView();
-        binding = null;
     }
-
 }

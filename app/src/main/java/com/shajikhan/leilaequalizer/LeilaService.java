@@ -6,13 +6,16 @@ import android.app.NotificationManager;
 import android.app.PendingIntent;
 import android.content.Context;
 import android.graphics.Color;
+import android.media.audiofx.BassBoost;
 import android.media.audiofx.Equalizer;
+import android.media.audiofx.Virtualizer;
 import android.os.Binder;
 import android.content.Intent;
 import android.os.Build;
 import android.os.Handler;
 import android.os.IBinder;
 import android.app.Service;
+import android.util.Log;
 import android.widget.RemoteViews;
 
 import androidx.core.app.NotificationCompat;
@@ -22,11 +25,11 @@ import androidx.core.content.ContextCompat;
 
 public class LeilaService extends Service {
     private final ServiceBinder binder = new ServiceBinder();
-
+    String tag = "LeilaService" ;
+    Context context ;
     public Equalizer eq;
-    NotificationChannel channel ;
-
-    private NotificationManager mNotificationManager;
+    private BassBoost bass ;
+    private Virtualizer virtual;
 
     /**
      * This gets called first when the service is created.
@@ -36,45 +39,17 @@ public class LeilaService extends Service {
     {
         super.onCreate();
 
-        eq = new Equalizer(1000000, 0);
-        for(short i = 0; i < 5; i++) {
-            eq.setBandLevel(i, (short) 0);
-        }
+        eq = new Equalizer(1, 0);
+//        for(short i = 0; i < 5; i++) {
+//            eq.setBandLevel(i, (short) 0);
+//        }
 
-        eq.setEnabled(true);
-
-        NotificationCompat.Builder builder = new NotificationCompat.Builder(this, "default")
-                .setSmallIcon(R.drawable.ic_launcher_foreground)
-                .setContentTitle("Equalizer")
-                .setContentText("Equalizer is running")
-                .setAutoCancel(false)
-                .setPriority(NotificationCompat.PRIORITY_DEFAULT);
-
-        createNotificationChannel();
-        NotificationManagerCompat notificationManager = NotificationManagerCompat.from(this);
-
-        // notificationId is a unique int for each notification that you must define
-        notificationManager.notify(1, builder.build());
-
+//        eq.setEnabled(true);
+        Log.d(tag, "Equalizer connected");
+        bass = new BassBoost(0,0);
+        virtual = new Virtualizer (0, 0);
     }
 
-    private void createNotificationChannel() {
-        // Create the NotificationChannel, but only on API 26+ because
-        // the NotificationChannel class is new and not in the support library
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
-            CharSequence name = getString(R.string.app_name);
-            String description = getString(R.string.app_name);
-            int importance = NotificationManager.IMPORTANCE_DEFAULT;
-            channel = new NotificationChannel("default", name, importance);
-            channel.setDescription(description);
-            // Register the channel with the system; you can't change the importance
-            // or other notification behaviors after this
-            mNotificationManager = getSystemService(NotificationManager.class);
-            mNotificationManager.createNotificationChannel(channel);
-        }
-
-
-    }
 
     /**
      * This gets called after onCreate() and only gets called
@@ -87,6 +62,7 @@ public class LeilaService extends Service {
     public int onStartCommand(Intent intent, int flags, int startId)
     {
         super.onStartCommand(intent, flags, startId);
+        Log.d(tag, "onStart");
 
         return START_STICKY; //This makes the system restart our
         //process if it gets interrupted.
@@ -157,7 +133,8 @@ public class LeilaService extends Service {
     {
         return eq;
     }
-
+    public BassBoost bassBoost () { return bass ;}
+    public Virtualizer virtualizer () {return virtual ;}
     /**
      * T// ----------------------------------------------------------------
      /**

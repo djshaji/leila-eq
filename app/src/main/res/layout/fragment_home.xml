@@ -14,7 +14,7 @@
         tools:layout_editor_absoluteX="1dp"
         tools:layout_editor_absoluteY="1dp">
 
-
+        <!--
         <TextView
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
@@ -33,27 +33,32 @@
             android:textAllCaps="true"
             android:textAppearance="@style/TextAppearance.AppCompat.Body2"
             android:textStyle="italic" />
-
+           -->
         <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_margin="30dp"
-            android:layout_marginTop="10dp"
+            android:orientation="vertical"
+            android:layout_marginTop="0dp"
+            android:layout_margin="20dp">
 
-            android:orientation="vertical">
-
-            <Switch
-                android:id="@+id/switch2"
-                android:layout_width="match_parent"
+            <TextView
+                android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:text="Enable" />
+                android:text="Presets"/>
+
+            <Spinner
+                android:id="@+id/eq_presets"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content" />
+
+
 
         </LinearLayout>
 
+
         <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_marginTop="30dp"
             android:orientation="vertical">
 
             <LinearLayout
@@ -64,30 +69,33 @@
                 android:padding="40dp"
                 android:orientation="vertical">
 
-
+                <ProgressBar
+                    android:id="@+id/eq_progressBar"
+                    style="?android:attr/progressBarStyle"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content" />
             </LinearLayout>
         </LinearLayout>
 
-
-        <RadioGroup
-            android:layout_margin="30dp"
-            android:id="@+id/select_stream"
+        <LinearLayout
             android:layout_width="match_parent"
-            android:layout_height="wrap_content" >
+            android:layout_height="wrap_content"
+            android:orientation="vertical"
+            android:layout_margin="20dp">
 
             <TextView
-                android:id="@+id/textView"
-                android:layout_width="match_parent"
+                android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:text="Apply Audio FX to" />
+                android:text="Apply Effect to"/>
 
-            <RadioButton
-                android:id="@+id/radioButton"
+            <Spinner
+                android:id="@+id/audio_sinks"
                 android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:text="System Audio" />
+                android:layout_height="wrap_content" />
 
-        </RadioGroup>
+
+
+        </LinearLayout>
 
         <Button
             android:id="@+id/open_eq"
@@ -95,6 +103,7 @@
             android:layout_height="wrap_content"
             android:layout_margin="20dp"
             android:text="Open System EQ" />
+
 
     </LinearLayout>
 </androidx.constraintlayout.widget.ConstraintLayout>

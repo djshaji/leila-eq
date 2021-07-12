@@ -14,9 +14,16 @@ import android.os.Build;
 import android.os.Bundle;
 import android.os.IBinder;
 import android.util.Log;
+import android.view.View;
+import android.widget.Button;
+import android.widget.CompoundButton;
+import android.widget.Switch;
+import android.widget.Toolbar;
 
 import com.google.android.material.bottomnavigation.BottomNavigationView;
 
+import androidx.annotation.RequiresApi;
+import androidx.appcompat.app.ActionBar;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.core.app.NotificationCompat;
 import androidx.core.app.NotificationManagerCompat;
@@ -39,28 +46,44 @@ public class MainActivity extends AppCompatActivity {
     public static final int NOTIFICATION_ID = 888;
     private NotificationManagerCompat mNotificationManagerCompat;
 
+    String tag = "Main" ;
     private Intent intent;
     public LeilaService leilaService;
     private boolean isServiceOn;
 
     private NotificationManager notificationManager;
-//    private ServiceConnection serviceConnection = new ServiceConnection() {
-//        public void onServiceConnected(ComponentName className,
-//                                       IBinder service) {
-//            leilaService =
-//                    ((LeilaService.ServiceBinder) service).getService();
-//            //TODO restore eq levels here
-////            for(short i = 0; i < 5; i ++) {
-////                eqService.equalizer().setBandLevel(i, model.getBandLevel(i));
-////            }
-//        }
 
-//        public void onServiceDisconnected(ComponentName className) {
-//            leilaService = null;
-//        }
-//    };
+    private ServiceConnection serviceConnection = new ServiceConnection() {
+        public void onServiceConnected(ComponentName className,
+                                       IBinder service) {
+            leilaService =
+                    ((LeilaService.ServiceBinder) service).getService();
+            //TODO restore eq levels here
+//            for(short i = 0; i < 5; i ++) {
+//                eqService.equalizer().setBandLevel(i, model.getBandLevel(i));
+//            }
+            final Switch s = findViewById(R.id.eq_toggle);
+            s.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
+                @Override
+                public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
+                    Log.d (tag, "service status" +  isChecked);
+                    leilaService.equalizer().setEnabled(isChecked);
+                    leilaService.bassBoost().setEnabled(isChecked);
+                    leilaService.virtualizer().setEnabled(isChecked);
+
+                }
+            });
+        }
+
+        public void onServiceDisconnected(ComponentName className) {
+            leilaService = null;
+        }
+    };
 
 
+
+
+    @RequiresApi(api = Build.VERSION_CODES.LOLLIPOP)
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -76,10 +99,6 @@ public class MainActivity extends AppCompatActivity {
 //
         Activity activity = this ;
 //        this.leilaService = new LeilaService() ;
-//        intent = new Intent(this, LeilaService.class);
-//        startService(intent);
-//        bindService(intent, serviceConnection, Context.BIND_AUTO_CREATE);
-//        isServiceOn = true;
 
         BottomNavigationView navView = findViewById(R.id.nav_view);
         // Passing each menu ID as a set of Ids because each
@@ -91,20 +110,54 @@ public class MainActivity extends AppCompatActivity {
         NavigationUI.setupActionBarWithNavController(this, navController, appBarConfiguration);
         NavigationUI.setupWithNavController(binding.navView, navController);
 
-        /*
-        Intent startIntent = new Intent(MainActivity.this, LeilaService.class);
-        startIntent.setAction(Constants.ACTION.START_ACTION);
 
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
-            startForegroundService(startIntent);
-        }else{
-            startService(startIntent);
-        }
+//        Intent startIntent = new Intent(MainActivity.this, LeilaService.class);
+//        startIntent.setAction(Constants.ACTION.START_ACTION);
 
-         */
+//        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+//            startForegroundService(startIntent);
+//        }else{
+//            startService(startIntent);
+//        }
+
+
+
+
+//        leilaService = new LeilaService() ;
 
         mNotificationManagerCompat = NotificationManagerCompat.from(getApplicationContext());
         generateNotification();
+
+        ActionBar actionBar = getSupportActionBar() ;
+        actionBar.hide();
+
+        Button quit = findViewById(R.id.quit_button1);
+//        quit = new Button(this) ;
+//        quit.setText("X");
+//        quit.setText("Close");
+
+        quit.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                finishAffinity();
+
+            }
+        });
+
+        Toolbar toolbar = findViewById(R.id.toolbar3);
+        setActionBar(toolbar);
+
+        intent = new Intent(this, LeilaService.class);
+//        startService(intent);
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+            startForegroundService(intent);
+        }else{
+            startService(intent);
+        }
+
+//        bindService(intent, serviceConnection, Context.BIND_AUTO_CREATE);
+        isServiceOn = true;
+        bindService(new Intent(this,LeilaService.class), serviceConnection, Context.BIND_AUTO_CREATE);
 
     }
 
@@ -133,13 +186,13 @@ public class MainActivity extends AppCompatActivity {
         // 2. Build the BIG_TEXT_STYLE.
         NotificationCompat.BigTextStyle bigTextStyle = new NotificationCompat.BigTextStyle()
                 // Overrides ContentText in the big form of the template.
-                .bigText("Big text")
+                .bigText(getString(R.string.app_name))
                 // Overrides ContentTitle in the big form of the template.
-                .setBigContentTitle("Big Title")
+                .setBigContentTitle(getString(R.string.notification));
                 // Summary line after the detail section in the big form of the template.
                 // Note: To improve readability, don't overload the user with info. If Summary Text
                 // doesn't add critical information, you should skip it.
-                .setSummaryText("Summary");
+//                .setSummaryText("Summary");
 
 
         // 3. Set up main Intent for notification.
@@ -224,9 +277,9 @@ public class MainActivity extends AppCompatActivity {
                 // BIG_TEXT_STYLE sets title and content for API 16 (4.1 and after).
                 .setStyle(bigTextStyle)
                 // Title for API <16 (4.0 and below) devices.
-                .setContentTitle("Tilte")
+                .setContentTitle(getString(R.string.app_name))
                 // Content for API <24 (7.0 and below) devices.
-                .setContentText("Content")
+                .setContentText(getString(R.string.notification))
                 .setSmallIcon(R.drawable.ic_launcher_foreground)
                 .setLargeIcon(BitmapFactory.decodeResource(
                         getResources(),
@@ -243,7 +296,7 @@ public class MainActivity extends AppCompatActivity {
                 // .setGroupSummary(true)
                 // .setGroup(GROUP_KEY_YOUR_NAME_HERE)
 
-                .setCategory(Notification.CATEGORY_REMINDER)
+                .setCategory(Notification.CATEGORY_SERVICE)
 
                 // Sets priority for 25 and below. For 26 and above, 'priority' is deprecated for
                 // 'importance' which is set in the NotificationChannel. The integers representing
@@ -255,8 +308,10 @@ public class MainActivity extends AppCompatActivity {
                 .setVisibility(NotificationCompat.VISIBILITY_PUBLIC)
 
                 // Adds additional actions specified above.
-                .addAction(snoozeAction)
-                .addAction(dismissAction)
+//                .addAction(snoozeAction)
+//                .addAction(dismissAction)
+                .setAutoCancel(false)
+                .setOngoing(true)
 
                 .build();
 

@@ -4,4 +4,23 @@
     <string name="title_home">Equalizer</string>
     <string name="title_dashboard">Bass / Surround</string>
     <string name="title_notifications">Normalization</string>
+    <string name="notification">Audio Mixer is running</string>
+    <string name="description">Rock Hard</string>
+    <string-array name="sinks">
+        <item>System default</item>
+    </string-array>
+    <string-array name="reverb">
+        <item>None</item>
+        <item>Plate</item>
+        <item>Small Room</item>
+        <item>Medium Room</item>
+        <item>Large Room</item>
+        <item>Medium Hall</item>
+        <item>Large Hall</item>
+    </string-array>
+    <string-array name="surround">
+        <item>Auto</item>
+        <item>Binaural</item>
+        <item>Transaural</item>
+    </string-array>
 </resources>
