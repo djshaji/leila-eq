@@ -19,31 +19,32 @@ import android.widget.Button;
 import android.widget.CompoundButton;
 import android.widget.Spinner;
 import android.widget.Switch;
-import android.widget.TextView;
 
 import androidx.annotation.NonNull;
-import androidx.annotation.Nullable;
 import androidx.annotation.RequiresApi;
 import androidx.fragment.app.Fragment;
-import androidx.lifecycle.Observer;
 import androidx.lifecycle.ViewModelProvider;
 
 import com.shajikhan.leilaequalizer.LeilaService;
 import com.shajikhan.leilaequalizer.R;
-import com.shajikhan.leilaequalizer.Reverb;
 import com.shajikhan.leilaequalizer.databinding.FragmentNotificationsBinding;
+
+import java.util.ArrayList;
+import java.util.Arrays;
+
+import static android.content.Context.MODE_PRIVATE;
 
 public class NotificationsFragment extends Fragment {
 
-    float [][] compressorPresets = {
+    public static float [][] compressorPresets = {
             // attack time, release time, ratio, threshold, knee, NoiseGate threshold,
             // expander ratio, pre gain, post gain
-            {3, 80, 1, -45, 0, -90, 1, 0, 0},
-            {50, 100, 2, -50, 0, -80, 3, 0, 0}, // ambient
+            {3, 80, 3, -25, 0, -90, 5, 0, 0},
+            {29, 80, 4, -30, 0, -90, 8, 0, 0}, // ambient
             {50, 100, 4, -18, 6, -80, 8, 0, 0}, // music
 //            {100, 200, 8, -20, 6, -80, 10, 6, 6}, // movie
             {200, 400, 8, -12, 0, -80, 20, 6, 6}, // speech
-            {20, 40, 8, -18, 6, -80, 20, 6, 6} // porn
+            {10, 25, 4, -25, 6, -90, 10, 0, 0} // porn
     } ;
 
     private NotificationsViewModel notificationsViewModel;
@@ -73,7 +74,7 @@ public class NotificationsFragment extends Fragment {
     public View onCreateView(@NonNull LayoutInflater inflater,
                              ViewGroup container, Bundle savedInstanceState) {
         context = getActivity();
-        sharedPref = getActivity().getPreferences(Context.MODE_PRIVATE);
+        sharedPref = getActivity().getPreferences(MODE_PRIVATE);
         pref = sharedPref.edit();
 
         notificationsViewModel =
@@ -88,6 +89,7 @@ public class NotificationsFragment extends Fragment {
         adapter.setDropDownViewResource( android.R.layout.simple_spinner_dropdown_item);
 
         compressor.setAdapter(adapter);
+        compressor.setSelection(sharedPref.getInt("compressorPreset", 0));
 
         Spinner limiter = (Spinner) root.findViewById(R.id.limiter);
         ArrayAdapter<CharSequence> adapter2 = ArrayAdapter.createFromResource(getActivity(),
@@ -124,8 +126,29 @@ public class NotificationsFragment extends Fragment {
             @Override
             public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
                 pref.putInt("compressorPreset", position).apply();
-                if (position > compressorPresets.length) // custom preset
+                if (position >= compressorPresets.length) {// custom preset
+                    Log.d(getClass().getName(), "looking for custom compressor settings");
+                    int [] arrayList = restoreCustomCompressor();
+                    if (arrayList != null) {
+                        DynamicsProcessing.MbcBand mbcBand = new DynamicsProcessing.MbcBand(
+                                true, 20000f,
+                                arrayList[0],
+                                arrayList[1],
+                                arrayList [2],
+                                arrayList[3],
+                                arrayList[4],
+                                arrayList[5],
+                                arrayList[6],
+                                arrayList[7],
+                                arrayList[8]
+                        );
+
+                        leilaService.getDynamicsProcessing().setMbcBandAllChannelsTo(0, mbcBand);
+                    }
+
                     return;
+                }
+
                 DynamicsProcessing.MbcBand mbcBand = new DynamicsProcessing.MbcBand(
                         true, 20000f,
                         compressorPresets [position][0],
@@ -158,4 +181,26 @@ public class NotificationsFragment extends Fragment {
         super.onDestroyView();
         binding = null;
     }
+
+    @RequiresApi(api = Build.VERSION_CODES.N)
+    private int[] restoreCustomCompressor () {
+//        String data = sharedPref.getString("compressorCustom", null);
+        SharedPreferences sharedPreferences = getActivity().getSharedPreferences("compressor", MODE_PRIVATE);
+        String data = sharedPreferences.getString("custom", null);
+//        String data = sharedPref.getString("compressorCustom", null);
+
+        if (data == null) {
+            Log.d (getClass().getCanonicalName(), "compressor data null");
+            return null;
+        }
+
+        Log.d (this.getClass().getName(), "Fetching custom compressor settings" + data);
+        String str = data ;
+        int[] arr = Arrays.stream(str.substring(1, str.length()-1).split(","))
+                .map(String::trim).mapToInt(Integer::parseInt).toArray();
+
+
+        return arr ;
+    }
+
 }
