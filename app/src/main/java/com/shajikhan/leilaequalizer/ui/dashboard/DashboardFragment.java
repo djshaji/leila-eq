@@ -9,13 +9,17 @@ import android.media.audiofx.BassBoost;
 import android.os.Build;
 import android.os.Bundle;
 import android.os.IBinder;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
+import android.widget.Button;
+import android.widget.CompoundButton;
 import android.widget.SeekBar;
 import android.widget.Spinner;
+import android.widget.Switch;
 import android.widget.TextView;
 
 import androidx.annotation.NonNull;
@@ -27,10 +31,12 @@ import androidx.lifecycle.ViewModelProvider;
 
 import com.shajikhan.leilaequalizer.LeilaService;
 import com.shajikhan.leilaequalizer.R;
+import com.shajikhan.leilaequalizer.Reverb;
 import com.shajikhan.leilaequalizer.databinding.FragmentDashboardBinding;
 
 public class DashboardFragment extends Fragment {
 
+    private static final String TAG = "BASS/SURROUND";
     private DashboardViewModel dashboardViewModel;
     private FragmentDashboardBinding binding;
     Context context ;
@@ -51,12 +57,14 @@ public class DashboardFragment extends Fragment {
         context = getContext();
 
         ServiceConnection serviceConnection = new ServiceConnection() {
+            @RequiresApi(api = Build.VERSION_CODES.LOLLIPOP)
             public void onServiceConnected(ComponentName className,
                                            IBinder service) {
                 leilaService =
                         ((LeilaService.ServiceBinder) service).getService();
                 setupBass();
                 setupSurround();
+                setupReverb();
                 //TODO restore eq levels here
 //            for(short i = 0; i < 5; i ++) {
 //                eqService.equalizer().setBandLevel(i, model.getBandLevel(i));
@@ -77,6 +85,78 @@ public class DashboardFragment extends Fragment {
         super.onDestroyView();
         binding = null;
     }
+
+    @RequiresApi(api = Build.VERSION_CODES.O)
+    private void setupReverb () {
+        Spinner spinner = (Spinner) getActivity().findViewById(R.id.reverb);
+        // Create an ArrayAdapter using the string array and a default spinner layout
+        ArrayAdapter<CharSequence> adapter = ArrayAdapter.createFromResource(context,
+                R.array.reverb, android.R.layout.simple_spinner_item);
+        // Specify the layout to use when the list of choices appears
+        adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
+        // Apply the adapter to the spinner
+        spinner.setAdapter(adapter);
+
+        Button button = getActivity().findViewById(R.id.reverb_advanced_button);
+        button.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                Intent intent = new Intent(getActivity(), Reverb.class);
+                startActivity(intent);
+
+            }
+        });
+
+        Switch toggle = getActivity().findViewById(R.id.reverb_toggle);
+        toggle.setChecked(leilaService.environmentalReverb().getEnabled());
+        toggle.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
+            @Override
+            public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
+                Log.d(TAG, "onCheckedChanged: " + isChecked);
+                leilaService.environmentalReverb().setEnabled(isChecked);
+                leilaService.presetReverb().setEnabled(isChecked);
+            }
+        });
+
+        Spinner reverb = getActivity().findViewById(R.id.reverb);
+        reverb.setSelection(leilaService.presetReverb().getPreset());
+        reverb.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
+            @Override
+            public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
+                leilaService.presetReverb().setPreset((short) position);
+                Log.d(TAG, "onItemSelected: " + position);
+            }
+
+            @Override
+            public void onNothingSelected(AdapterView<?> parent) {
+
+            }
+        });
+
+        SeekBar amount = getActivity().findViewById(R.id.reverb_amount);
+        amount.setMax(0);
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+            amount.setMin(-9000);
+        }
+        amount.setProgress(leilaService.environmentalReverb().getRoomLevel());
+        amount.setOnSeekBarChangeListener(new SeekBar.OnSeekBarChangeListener() {
+            @Override
+            public void onProgressChanged(SeekBar seekBar, int progress, boolean fromUser) {
+                leilaService.environmentalReverb().setRoomLevel((short) progress);
+            }
+
+            @Override
+            public void onStartTrackingTouch(SeekBar seekBar) {
+
+            }
+
+            @Override
+            public void onStopTrackingTouch(SeekBar seekBar) {
+
+            }
+        });
+    }
+
 
     @RequiresApi(api = Build.VERSION_CODES.LOLLIPOP)
     private void setupSurround () {
@@ -109,14 +189,16 @@ public class DashboardFragment extends Fragment {
         adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
         // Apply the adapter to the spinner
         spinner.setAdapter(adapter);
-        spinner.setSelection(sharedPref.getInt("virtualizerMode",leilaService.virtualizer().getVirtualizationMode() + 1));
+        spinner.setSelection(sharedPref.getInt("virtualizerMode",(int) (leilaService.virtualizer().getVirtualizationMode() + 1))-1);
 
         spinner.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
             @RequiresApi(api = Build.VERSION_CODES.LOLLIPOP)
             @Override
             public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
+                view.setEnabled(false);
                 leilaService.virtualizer().forceVirtualizationMode(position + 1);
                 pref.putInt("virtualizerMode", position + 1).apply();
+                view.setEnabled(true);
             }
 
             @Override

@@ -12,81 +12,61 @@
         android:layout_margin="20dp"
         android:orientation="vertical">
 
-        <Switch
-            android:id="@+id/switch1"
+        <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:text="Compressor"
-            tools:layout_editor_absoluteX="196dp"
-            tools:layout_editor_absoluteY="36dp" />
+            android:orientation="horizontal">
+            <Switch
+                android:id="@+id/compressor_toggle"
+                android:layout_width="wrap_content"
+                android:layout_weight="1"
+                android:layout_height="wrap_content"
+                android:text="Compressor"/>
 
-        <RadioGroup
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content" >
 
-        <RadioButton
-            android:id="@+id/r_none"
+            <Button
+                style="@style/Widget.AppCompat.Button.Borderless"
+                android:layout_width="wrap_content"
+                android:id="@+id/compressor_advanced"
+                android:layout_height="wrap_content"
+                android:drawableRight="@drawable/ic_baseline_settings_24"/>
+        </LinearLayout>
+        <Spinner
             android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:text="Minimal" />
-        <RadioButton
-            android:id="@+id/c_ambient"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:text="Ambient" />
-        <RadioButton
-            android:id="@+id/c_music"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:text="Music" />
-        <RadioButton
-            android:id="@+id/c_movie"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:text="Movie" />
-        <RadioButton
-            android:id="@+id/c_porn"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:text="Porn" />
+            android:layout_margin="20dp"
+            android:id="@+id/compressor"
+            android:layout_height="wrap_content"/>
 
-        </RadioGroup>
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal">
 
-        <Switch
-            android:layout_marginTop="20dp"
-            android:id="@+id/switch2"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:text="Limiter" />
-        <RadioGroup
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content" >
+            <Switch
+                android:layout_marginTop="5dp"
+                android:id="@+id/limiter_toggle"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:text="Limiter" />
 
-        <RadioButton
-            android:id="@+id/lmt_light"
+            <Button
+                style="@style/Widget.AppCompat.Button.Borderless"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:drawableRight="@drawable/ic_baseline_settings_24"/>
+
+        </LinearLayout>
+
+        <Spinner
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:text="Light" />
-        <RadioButton
-            android:id="@+id/lmt_heavy"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:text="Heavy" />
-        <RadioButton
-            android:id="@+id/lmt_extreme"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:text="Extreme" />
-        <RadioButton
-            android:id="@+id/lmt_nuts"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:text="Are you nuts?" />
-        </RadioGroup>
+            android:id="@+id/limiter"
+            android:layout_margin="20dp"/>
 
         <Switch
             android:layout_marginTop="20dp"
-            android:id="@+id/switch3"
+            android:id="@+id/loudness_toggle"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:text="Loudness Enhancer" />
@@ -100,12 +80,25 @@
             android:layout_marginBottom="10dp"
             android:text="Gain" />
 
-        <SeekBar
-            android:id="@+id/seekBar4"
-            android:layout_marginLeft="30dp"
-            android:layout_marginRight="30dp"
+        <LinearLayout
             android:layout_width="match_parent"
-            android:layout_height="wrap_content" />
+            android:layout_height="wrap_content"
+            android:orientation="horizontal">
+            <SeekBar
+                android:id="@+id/seekBar4"
+                android:layout_marginLeft="30dp"
+                android:layout_marginRight="30dp"
+                android:layout_width="match_parent"
+                android:layout_weight="1"
+                android:layout_marginTop="13dp"
+                android:layout_height="wrap_content" />
+
+            <EditText
+                android:ems="2"
+                android:layout_marginRight="10dp"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"/>
+        </LinearLayout>
 
     </LinearLayout>
 

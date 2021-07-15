@@ -1,7 +1,9 @@
 <?xml version="1.0" encoding="utf-8"?>
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
     package="com.shajikhan.leilaequalizer">
-
+    <!-- Include required permissions for Google Mobile Ads to run. -->
+    <uses-permission android:name="android.permission.INTERNET" />
+    <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE" />
     <uses-permission android:name="android.permission.MODIFY_AUDIO_SETTINGS" />
     <uses-permission android:name="android.permission.FOREGROUND_SERVICE" />
 
@@ -12,6 +14,9 @@
         android:roundIcon="@mipmap/ic_launcher_round"
         android:supportsRtl="true"
         android:theme="@style/Theme.LeilaEqualizer">
+        <activity android:name=".ui.notifications.Compressor"></activity>
+        <activity android:name=".Reverb"></activity>
+
         <meta-data
             android:name="com.google.android.actions"
             android:resource="@xml/actions" />
@@ -25,7 +30,8 @@
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
-        <service android:name="com.shajikhan.leilaequalizer.LeilaService"/>
+
+        <service android:name=".LeilaService" />
     </application>
 
 </manifest>

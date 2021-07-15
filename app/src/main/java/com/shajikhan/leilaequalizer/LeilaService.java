@@ -7,7 +7,10 @@ import android.app.PendingIntent;
 import android.content.Context;
 import android.graphics.Color;
 import android.media.audiofx.BassBoost;
+import android.media.audiofx.DynamicsProcessing;
+import android.media.audiofx.EnvironmentalReverb;
 import android.media.audiofx.Equalizer;
+import android.media.audiofx.PresetReverb;
 import android.media.audiofx.Virtualizer;
 import android.os.Binder;
 import android.content.Intent;
@@ -18,6 +21,7 @@ import android.app.Service;
 import android.util.Log;
 import android.widget.RemoteViews;
 
+import androidx.annotation.RequiresApi;
 import androidx.core.app.NotificationCompat;
 import androidx.core.app.NotificationManagerCompat;
 import androidx.core.content.ContextCompat;
@@ -30,10 +34,17 @@ public class LeilaService extends Service {
     public Equalizer eq;
     private BassBoost bass ;
     private Virtualizer virtual;
+    private EnvironmentalReverb reverb ;
+    private PresetReverb pReverb ;
+    private DynamicsProcessing dynamicsProcessing ;
+    private DynamicsProcessing.Mbc mbc ;
+    private DynamicsProcessing.MbcBand mbcBand ;
+    private DynamicsProcessing.Limiter limiter ;
 
     /**
      * This gets called first when the service is created.
      */
+    @RequiresApi(api = Build.VERSION_CODES.P)
     @Override
     public void onCreate()
     {
@@ -48,6 +59,42 @@ public class LeilaService extends Service {
         Log.d(tag, "Equalizer connected");
         bass = new BassBoost(0,0);
         virtual = new Virtualizer (0, 0);
+        reverb = new EnvironmentalReverb(0, 0);
+        pReverb = new PresetReverb(0, 0);
+
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+//            dynamicsProcessing = new DynamicsProcessing(0);
+//        mbc = new DynamicsProcessing.Mbc (0);
+            mbcBand = new DynamicsProcessing.MbcBand(true, 16000.0f, 50f,
+                    100f, 2.0f, -50f, 0.0f,
+                    -80f, 3.0f, 0.0f, 6.0f);
+//            for (int i = 0; i < 10; i++)
+//                dynamicsProcessing.setMbcBandAllChannelsTo(i, mbcBand);
+            DynamicsProcessing.Config.Builder builder = new DynamicsProcessing.Config.Builder(
+                    DynamicsProcessing.VARIANT_FAVOR_FREQUENCY_RESOLUTION,
+                    1,
+                    false,
+                    0,
+                    true,
+                    1,
+                    false,
+                    0,
+                    false
+            );
+            builder.setPreferredFrameDuration(10);
+            DynamicsProcessing.Config config = builder.build();
+            mbc = config.getChannelByChannelIndex(0).getMbc();
+//            mbcBand = mbc.getBand(0);
+
+            mbc.setEnabled(true);
+//            mbc.setBand(0,mbcBand);
+            mbcBand.setEnabled(true);
+            dynamicsProcessing = new DynamicsProcessing(0, 0, config);
+            dynamicsProcessing.setEnabled(true);
+        }
+
+
+//        Log.d(tag, dynamicsProcessing.getConfig().toString());
     }
 
 
@@ -64,7 +111,7 @@ public class LeilaService extends Service {
         super.onStartCommand(intent, flags, startId);
         Log.d(tag, "onStart");
 
-        return START_STICKY; //This makes the system restart our
+        return START_NOT_STICKY; //This makes the system restart our
         //process if it gets interrupted.
     }
 
@@ -86,6 +133,16 @@ public class LeilaService extends Service {
     public void onDestroy()
     {
         super.onDestroy();
+        eq.release ();
+        bass.release () ;
+        virtual.release();
+        reverb.release() ;
+        pReverb.release() ;
+         dynamicsProcessing.release() ;
+//         mbc ;
+//         mbcBand.release() ;
+//        private DynamicsProcessing.Limiter limiter ;
+
         //.
     }
 
@@ -135,6 +192,12 @@ public class LeilaService extends Service {
     }
     public BassBoost bassBoost () { return bass ;}
     public Virtualizer virtualizer () {return virtual ;}
+    public EnvironmentalReverb environmentalReverb () { return reverb ;}
+    public PresetReverb presetReverb () { return pReverb ;}
+    @RequiresApi(api = Build.VERSION_CODES.P)
+    public DynamicsProcessing.MbcBand compressor () { return dynamicsProcessing.getMbcBandByChannelIndex(0,0); }
+    public DynamicsProcessing getDynamicsProcessing () { return dynamicsProcessing ;}
+
     /**
      * T// ----------------------------------------------------------------
      /**

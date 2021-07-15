@@ -1,6 +1,6 @@
 <resources>
     <string name="app_name">Audio Lund</string>
-<!--    <string name="app_name">Leila Equalizer</string>-->
+    <!--    <string name="app_name">Leila Equalizer</string>-->
     <string name="title_home">Equalizer</string>
     <string name="title_dashboard">Bass / Surround</string>
     <string name="title_notifications">Normalization</string>
@@ -22,5 +22,22 @@
         <item>Auto</item>
         <item>Binaural</item>
         <item>Transaural</item>
+    </string-array>
+    <string name="title_activity_splash">MainActivity</string>
+    <string name="action_settings">Settings</string>
+    <string-array name="compressor">
+        <item>Ambient</item>
+        <item>Music</item>
+        <item>Movie</item>
+        <item>Speech</item>
+        <item>Porn</item>
+        <item>Custom</item>
+    </string-array>
+    <string-array name="limiter">
+        <item>Low</item>
+        <item>Medium</item>
+        <item>High</item>
+        <item>Extreme</item>
+        <item>Are you nuts?</item>
     </string-array>
 </resources>

@@ -181,6 +181,7 @@ public class HomeFragment extends Fragment {
 
                 current_preset = (short) position;
                 mEqualizer.usePreset((short) position);
+                pref.putInt("eq-preset", position).apply();
             }
 
             @Override
@@ -194,7 +195,7 @@ public class HomeFragment extends Fragment {
             }
         });
 
-        preset.setSelection(mEqualizer.getCurrentPreset());
+        preset.setSelection(sharedPref.getInt("eq-preset", mEqualizer.getCurrentPreset()));
         mLinearLayout.removeAllViews();
 //        mLinearLayout = root.findViewById (R.id.eq_ll);
 //        mLinearLayout = new LinearLayout(context);
@@ -245,7 +246,9 @@ public class HomeFragment extends Fragment {
             bar.setLayoutParams(layoutParams);
 //            bar.setMax(12);
             bar.setMax(maxEQLevel - minEQLevel);
-            bar.setMin(minEQLevel);
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+                bar.setMin(minEQLevel);
+            }
             bar.setProgress(sharedPref.getInt("eq-" + band, mEqualizer.getBandLevel(band)));
 
 //            bar.setProgress(6);

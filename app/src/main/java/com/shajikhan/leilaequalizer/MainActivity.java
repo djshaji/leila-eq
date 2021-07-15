@@ -139,8 +139,13 @@ public class MainActivity extends AppCompatActivity {
         quit.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
+                leilaService.stopForeground(true);
+                leilaService.onDestroy();
+//                leilaService.stopSelf();
+//                stopService(intent);
+                mNotificationManagerCompat.cancelAll();
                 finishAffinity();
-
+                finish();
             }
         });
 
