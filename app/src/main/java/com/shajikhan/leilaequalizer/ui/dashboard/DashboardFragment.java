@@ -65,6 +65,10 @@ public class DashboardFragment extends Fragment {
                 setupBass();
                 setupSurround();
                 setupReverb();
+                Switch bb = root.findViewById(R.id.bb_toggle),
+                        ss = root.findViewById(R.id.ss_toggle);
+                bb.setChecked(sharedPref.getBoolean("bassBoostEnabled", false));
+                ss.setChecked(sharedPref.getBoolean("surroundSoundEnabled", false));
                 //TODO restore eq levels here
 //            for(short i = 0; i < 5; i ++) {
 //                eqService.equalizer().setBandLevel(i, model.getBandLevel(i));
@@ -75,6 +79,25 @@ public class DashboardFragment extends Fragment {
                 leilaService = null;
             }
         };
+
+        Switch bb = root.findViewById(R.id.bb_toggle);
+        bb.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
+            @Override
+            public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
+                leilaService.bassBoost().setEnabled(isChecked);
+                pref.putBoolean("bassBoostEnabled", isChecked).commit();
+            }
+        });
+
+        Switch ss = root.findViewById(R.id.ss_toggle);
+        ss.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
+            @Override
+            public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
+                leilaService.virtualizer().setEnabled(isChecked);
+                pref.putBoolean("surroundSoundEnabled", isChecked).commit();
+
+            }
+        });
 
         context.bindService(new Intent(context,LeilaService.class), serviceConnection, Context.BIND_AUTO_CREATE);
         return root;

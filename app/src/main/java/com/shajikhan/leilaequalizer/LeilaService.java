@@ -10,6 +10,7 @@ import android.media.audiofx.BassBoost;
 import android.media.audiofx.DynamicsProcessing;
 import android.media.audiofx.EnvironmentalReverb;
 import android.media.audiofx.Equalizer;
+import android.media.audiofx.LoudnessEnhancer;
 import android.media.audiofx.PresetReverb;
 import android.media.audiofx.Virtualizer;
 import android.os.Binder;
@@ -40,6 +41,7 @@ public class LeilaService extends Service {
     private DynamicsProcessing.Mbc mbc ;
     private DynamicsProcessing.MbcBand mbcBand ;
     private DynamicsProcessing.Limiter limiter ;
+    private LoudnessEnhancer loudnessEnhancer ;
 
     /**
      * This gets called first when the service is created.
@@ -79,18 +81,22 @@ public class LeilaService extends Service {
                     1,
                     false,
                     0,
-                    false
+                    true
             );
             builder.setPreferredFrameDuration(10);
             DynamicsProcessing.Config config = builder.build();
             mbc = config.getChannelByChannelIndex(0).getMbc();
 //            mbcBand = mbc.getBand(0);
 
+            limiter = config.getLimiterByChannelIndex(0);
+
             mbc.setEnabled(true);
 //            mbc.setBand(0,mbcBand);
             mbcBand.setEnabled(true);
             dynamicsProcessing = new DynamicsProcessing(0, 0, config);
             dynamicsProcessing.setEnabled(true);
+
+            loudnessEnhancer = new LoudnessEnhancer(0);
         }
 
 
@@ -111,7 +117,7 @@ public class LeilaService extends Service {
         super.onStartCommand(intent, flags, startId);
         Log.d(tag, "onStart");
 
-        return START_NOT_STICKY; //This makes the system restart our
+        return START_STICKY; //This makes the system restart our
         //process if it gets interrupted.
     }
 
@@ -139,6 +145,7 @@ public class LeilaService extends Service {
         reverb.release() ;
         pReverb.release() ;
          dynamicsProcessing.release() ;
+         loudnessEnhancer.release();
 //         mbc ;
 //         mbcBand.release() ;
 //        private DynamicsProcessing.Limiter limiter ;
@@ -197,6 +204,12 @@ public class LeilaService extends Service {
     @RequiresApi(api = Build.VERSION_CODES.P)
     public DynamicsProcessing.MbcBand compressor () { return dynamicsProcessing.getMbcBandByChannelIndex(0,0); }
     public DynamicsProcessing getDynamicsProcessing () { return dynamicsProcessing ;}
+    public LoudnessEnhancer getLoudnessEnhancer () { return loudnessEnhancer ; }
+
+    @RequiresApi(api = Build.VERSION_CODES.P)
+    public DynamicsProcessing.Limiter getLimiter() {
+        return dynamicsProcessing.getConfig().getLimiterByChannelIndex(0);
+    }
 
     /**
      * T// ----------------------------------------------------------------

@@ -41,10 +41,26 @@
             android:layout_marginTop="0dp"
             android:layout_margin="20dp">
 
-            <TextView
-                android:layout_width="wrap_content"
+            <LinearLayout
+                android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:text="Presets"/>
+                android:orientation="horizontal">
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="Presets"/>
+
+                <Switch
+                    android:layout_weight="1"
+                    android:text="Enable"
+                    android:id="@+id/eq_toggle"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:gravity="right"/>
+
+
+            </LinearLayout>
 
             <Spinner
                 android:id="@+id/eq_presets"

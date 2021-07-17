@@ -39,5 +39,6 @@
         <item>High</item>
         <item>Extreme</item>
         <item>Are you nuts?</item>
+        <item>Custom</item>
     </string-array>
 </resources>

@@ -68,8 +68,8 @@ public class MainActivity extends AppCompatActivity {
                 public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
                     Log.d (tag, "service status" +  isChecked);
                     leilaService.equalizer().setEnabled(isChecked);
-                    leilaService.bassBoost().setEnabled(isChecked);
-                    leilaService.virtualizer().setEnabled(isChecked);
+//                    leilaService.bassBoost().setEnabled(isChecked);
+//                    leilaService.virtualizer().setEnabled(isChecked);
 
                 }
             });

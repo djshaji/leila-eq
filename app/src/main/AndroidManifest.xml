@@ -14,8 +14,9 @@
         android:roundIcon="@mipmap/ic_launcher_round"
         android:supportsRtl="true"
         android:theme="@style/Theme.LeilaEqualizer">
-        <activity android:name=".ui.notifications.Compressor"></activity>
-        <activity android:name=".Reverb"></activity>
+        <activity android:name=".Limiter"></activity>
+        <activity android:name=".ui.notifications.Compressor" />
+        <activity android:name=".Reverb" />
 
         <meta-data
             android:name="com.google.android.actions"
