@@ -126,7 +126,8 @@ public class MainActivity extends AppCompatActivity {
 //        leilaService = new LeilaService() ;
 
         mNotificationManagerCompat = NotificationManagerCompat.from(getApplicationContext());
-        generateNotification();
+        // we want to do this inside the service so it wont get killed
+//        generateNotification();
 
         ActionBar actionBar = getSupportActionBar() ;
         actionBar.hide();

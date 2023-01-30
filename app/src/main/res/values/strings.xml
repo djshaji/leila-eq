@@ -1,5 +1,5 @@
 <resources>
-    <string name="app_name">Audio Lund</string>
+    <string name="app_name">Dynamix</string>
     <!--    <string name="app_name">Leila Equalizer</string>-->
     <string name="title_home">Equalizer</string>
     <string name="title_dashboard">Bass / Surround</string>
